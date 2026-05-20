@@ -199,7 +199,7 @@ def _solution_card(sol: dict, st, idx: int) -> Table:
 def generate_report(lead: dict, enriched: dict) -> str:
     from django.conf import settings as djs
     reports_dir = Path(djs.REPORTS_DIR)
-    reports_dir.mkdir(exist_ok=True)
+    reports_dir.mkdir(exist_ok=True,parents=True)
 
     safe     = re.sub(r"[^\w\-]", "_", lead["company"])
     ts       = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
