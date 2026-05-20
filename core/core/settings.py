@@ -5,7 +5,7 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key-change-me")
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
@@ -23,6 +23,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -79,3 +80,11 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
     "DEFAULT_PARSER_CLASSES":   ["rest_framework.parsers.JSONParser"],
 }
+
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+import dj_database_url
+if os.environ.get("DATABASE_URL"):
+    DATABASES["default"] = dj_database_url.parse(os.environ.get("DATABASE_URL"))
