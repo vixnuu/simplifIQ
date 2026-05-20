@@ -1,0 +1,51 @@
+SimplifIQ — Lead Automation System
+===================================
+
+What I Built
+------------
+A full end-to-end lead automation system using Django that:
+- Captures and validates prospect form submissions
+- Enriches company data using Groq AI (LLaMA 3.3 70B)
+- Generates a personalised PDF audit report using ReportLab
+- Delivers the report via email using SendGrid
+- Tracks all leads in a SQLite database
+- Deployed live on Render
+
+Tech Stack
+----------
+- Backend: Django + Django REST Framework
+- AI Enrichment: Groq API (LLaMA 3.3 70B)
+- PDF Generation: ReportLab
+- Email: SendGrid
+- Database: SQLite (local) / PostgreSQL ready (Render)
+- Deployment: Render
+- Version Control: GitHub
+
+Challenges & How I Solved Them
+--------------------------------
+1. Render free tier blocks outgoing SMTP connections
+   → Switched from Gmail SMTP to SendGrid HTTP API
+
+2. Memory issues on Render free tier (512MB)
+   → Moved pipeline to background thread, reduced scraping payload
+
+3. Web scraping blocked on Render
+   → Added graceful fallback to AI-only enrichment when scraping fails
+
+4. Gmail App Password authentication issues
+   → Resolved by enabling 2-Step Verification first
+
+Tradeoffs & Limitations
+------------------------
+- Free tier Render spins down after inactivity (30s cold start)
+- Web scraping is best-effort; AI fallback ensures pipeline never breaks
+- SQLite used for simplicity; swap DATABASE_URL for PostgreSQL in production
+- Google Sheets and Drive bonus features ready but require service account setup
+
+What I Learned
+--------------
+- End-to-end Django REST API design and deployment
+- Integrating third-party APIs (Groq, SendGrid, ReportLab)
+- Handling production constraints (memory, network restrictions)
+- Background threading in Django for long-running tasks
+- Environment-based configuration for dev/prod parity
