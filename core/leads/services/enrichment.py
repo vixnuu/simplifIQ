@@ -87,7 +87,10 @@ def enrich_company(lead: dict) -> dict:
     - Any failure in scraping/LLM parsing falls back to `_fallback()`.
     """
 
-    scraped = scrape_website(lead["website"]) if lead.get("website") else {}
+    try:
+        scraped = scrape_website(lead["website"]) if lead.get("website") else {}
+    except Exception:
+        scraped = {}
 
     # Context is embedded into the prompt so the LLM can produce a structured response.
     context = f"""

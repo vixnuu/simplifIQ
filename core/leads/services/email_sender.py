@@ -40,27 +40,27 @@ publicly available sources. All findings are personalised to {company}.
 
 
 def send_report_email(lead: dict, report_path: str) -> None:
-    """
-    Compose and send the audit report email with the PDF attached.
-    Raises on failure so the view can handle the error gracefully.
-    """
-    body = EMAIL_BODY_TEMPLATE.format(
-        name=lead["name"],
-        company=lead["company"],
-        industry=lead["industry"],
-    )
+    try:
+        body = EMAIL_BODY_TEMPLATE.format(
+            name=lead["name"],
+            company=lead["company"],
+            industry=lead["industry"],
+        )
 
-    msg = EmailMessage(
-        subject=EMAIL_SUBJECT,
-        body=body,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[lead["email"]],
-        reply_to=[settings.DEFAULT_FROM_EMAIL],
-    )
+        msg = EmailMessage(
+            subject=EMAIL_SUBJECT,
+            body=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[lead["email"]],
+            reply_to=[settings.DEFAULT_FROM_EMAIL],
+        )
 
-    filename = os.path.basename(report_path)
-    with open(report_path, "rb") as f:
-        msg.attach(filename, f.read(), "application/pdf")
+        filename = os.path.basename(report_path)
+        with open(report_path, "rb") as f:
+            msg.attach(filename, f.read(), "application/pdf")
 
-    msg.send(fail_silently=False)
-    print(f"  ✓ Email sent to {lead['email']}")
+        msg.send(fail_silently=False)
+        print(f"  ✓ Email sent to {lead['email']}")
+    except Exception as e:
+        print(f"  ✗ Email failed: {str(e)}")
+        raise
