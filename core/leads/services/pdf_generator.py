@@ -16,6 +16,7 @@ from reportlab.platypus import (
     HRFlowable, KeepTogether, PageBreak,
 )
 from reportlab.platypus.flowables import Flowable
+import gc
 
 # ── Palette ────────────────────────────────────────────────────────────────
 C = {
@@ -408,5 +409,6 @@ def generate_report(lead: dict, enriched: dict) -> str:
 
     # Build
     doc.build(story, onFirstPage=cb, onLaterPages=cb)
+    gc.collect()
     print(f"  ✓ PDF generated: {filepath}")
     return filepath

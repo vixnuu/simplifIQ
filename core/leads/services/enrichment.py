@@ -45,7 +45,7 @@ def _scrape(url: str) -> str:
             tag.decompose()
 
         text = soup.get_text(" ", strip=True)
-        return re.sub(r"\s{2,}", " ", text)[:5000]
+        return re.sub(r"\s{2,}", " ", text)[:2000]
     except Exception as e:
         print(f"  ⚠ scrape failed {url}: {e}")
         return ""
@@ -140,7 +140,7 @@ Data:
         # Groq chat completion call. The prompt asks for strict JSON output.
         resp = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
-            max_tokens=1500,
+            max_tokens=800,
             messages=[{"role": "user", "content": prompt}],
         )
 
