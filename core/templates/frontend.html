@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimplifIQ — AI Business Audit</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --dark:    #0D1117;
+      --dark2:   #161B22;
+      --accent:  #4F8EF7;
+      --acc-lt:  #EBF2FF;
+      --border:  #30363D;
+      --text:    #E6EDF3;
+      --muted:   #8B949E;
+      --success: #3FB950;
+      --error:   #F85149;
+      --radius:  10px;
+    }
+
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── NAV ─────────────────────────────────────────────────────── */
+    nav {
+      width: 100%;
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13,17,23,0.95);
+      backdrop-filter: blur(8px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.25rem; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
+    .logo span { color: var(--text); }
+    nav p { font-size: .85rem; color: var(--muted); }
+
+    /* ── HERO ────────────────────────────────────────────────────── */
+    .hero {
+      width: 100%;
+      padding: 72px 20px 52px;
+      text-align: center;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(79,142,247,0.12) 0%, transparent 70%);
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(79,142,247,.15); border: 1px solid rgba(79,142,247,.3);
+      color: var(--accent); font-size: .78rem; font-weight: 600;
+      padding: 4px 12px; border-radius: 99px; margin-bottom: 24px;
+    }
+    .badge::before { content: "●"; font-size: .5rem; }
+    h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    h1 em { color: var(--accent); font-style: normal; }
+    .hero p { color: var(--muted); font-size: 1.05rem; max-width: 540px; margin: 0 auto 36px; line-height: 1.6; }
+
+    /* ── STATS STRIP ─────────────────────────────────────────────── */
+    .stats {
+      display: flex; gap: 0; justify-content: center;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; margin-bottom: 0; max-width: 540px; width: 100%;
+    }
+    .stat {
+      flex: 1; padding: 14px 16px; text-align: center;
+      background: var(--dark2); border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat strong { display: block; font-size: 1.35rem; font-weight: 800; color: var(--accent); }
+    .stat span { font-size: .72rem; color: var(--muted); }
+
+    /* ── FORM CARD ───────────────────────────────────────────────── */
+    .card {
+      background: var(--dark2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%; max-width: 600px;
+      margin: 48px 20px 80px;
+    }
+    .card-header { margin-bottom: 28px; }
+    .card-header h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; }
+    .card-header p { color: var(--muted); font-size: .875rem; line-height: 1.5; }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width: 520px) { .grid2 { grid-template-columns: 1fr; } }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    label { font-size: .8rem; font-weight: 600; color: var(--muted); letter-spacing: .4px; text-transform: uppercase; }
+    label .req { color: var(--error); margin-left: 2px; }
+
+    input, select, textarea {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: .95rem;
+      padding: 10px 14px;
+      transition: border-color .2s;
+      width: 100%;
+      font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,142,247,.15);
+    }
+    input.error, select.error, textarea.error { border-color: var(--error); }
+    select option { background: var(--dark2); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    .divider {
+      grid-column: 1 / -1;
+      border: none; border-top: 1px solid var(--border);
+      margin: 4px 0;
+    }
+
+    /* ── SUBMIT BUTTON ────────────────────────────────────────────── */
+    button[type=submit] {
+      grid-column: 1 / -1;
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 8px;
+    }
+    button[type=submit]:hover:not(:disabled) { background: #3a76e0; }
+    button[type=submit]:active:not(:disabled) { transform: scale(.98); }
+    button[type=submit]:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* ── SPINNER ──────────────────────────────────────────────────── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── STATUS BANNER ────────────────────────────────────────────── */
+    .status-banner {
+      grid-column: 1 / -1;
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: .9rem;
+      display: none;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .status-banner.show { display: flex; }
+    .status-banner.success { background: rgba(63,185,80,.12); border: 1px solid rgba(63,185,80,.3); color: #3FB950; }
+    .status-banner.error   { background: rgba(248,81,73,.12);  border: 1px solid rgba(248,81,73,.3);  color: #F85149; }
+    .status-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── PIPELINE STEPS ───────────────────────────────────────────── */
+    .pipeline {
+      grid-column: 1 / -1;
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    .pipeline.show { display: flex; }
+    .step {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .88rem;
+    }
+    .step:last-child { border-bottom: none; }
+    .step-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-icon.done    { background: rgba(63,185,80,.2);  color: var(--success); }
+    .step-icon.active  { background: rgba(79,142,247,.2); color: var(--accent); }
+    .step-icon.waiting { background: rgba(139,148,158,.1); color: var(--muted); }
+    .step-label { color: var(--text); }
+    .step-label.muted { color: var(--muted); }
+
+    /* ── HOW IT WORKS ─────────────────────────────────────────────── */
+    .how { max-width: 600px; width: 100%; margin: 0 20px 80px; }
+    .how h3 { font-size: .8rem; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+    .steps-row { display: flex; gap: 12px; }
+    @media(max-width: 520px) { .steps-row { flex-direction: column; } }
+    .how-step {
+      flex: 1;
+      background: var(--dark2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .how-step .num { font-size: 1.4rem; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
+    .how-step p { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Simplif<span>IQ</span></div>
+    <p>AI-Powered Lead Automation</p>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="badge">Fully Automated Pipeline</div>
+    <h1>Your Personalised<br/><em>Business Audit</em><br/>In Seconds</h1>
+    <p>Submit your company details. We'll research, generate a PDF report, and deliver it to your inbox — automatically.</p>
+    <div class="stats">
+      <div class="stat"><strong>&lt;60s</strong><span>End-to-end</span></div>
+      <div class="stat"><strong>AI</strong><span>Enrichment</span></div>
+      <div class="stat"><strong>PDF</strong><span>Delivered</span></div>
+    </div>
+  </section>
+
+  <!-- FORM CARD -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Request Your Free Audit Report</h2>
+      <p>Fill in your details — we handle everything else. Your personalised report will arrive in your inbox within minutes.</p>
+    </div>
+
+    <form id="leadForm">
+      <div class="grid2">
+
+        <!-- Name -->
+        <div class="field">
+          <label for="name">Full Name <span class="req">*</span></label>
+          <input id="name" name="name" type="text" placeholder="Arjun Sharma" required />
+        </div>
+
+        <!-- Email -->
+        <div class="field">
+          <label for="email">Work Email <span class="req">*</span></label>
+          <input id="email" name="email" type="email" placeholder="arjun@company.io" required />
+        </div>
+
+        <!-- Company -->
+        <div class="field">
+          <label for="company">Company Name <span class="req">*</span></label>
+          <input id="company" name="company" type="text" placeholder="TechWave Solutions" required />
+        </div>
+
+        <!-- Website -->
+        <div class="field">
+          <label for="website">Company Website</label>
+          <input id="website" name="website" type="url" placeholder="https://yourcompany.com" />
+        </div>
+
+        <!-- Industry -->
+        <div class="field">
+          <label for="industry">Industry <span class="req">*</span></label>
+          <select id="industry" name="industry" required>
+            <option value="" disabled selected>Select your industry</option>
+            <option>SaaS / B2B Software</option>
+            <option>FinTech</option>
+            <option>Consulting & Professional Services</option>
+            <option>E-Commerce & Retail</option>
+            <option>Healthcare & MedTech</option>
+            <option>EdTech</option>
+            <option>Logistics & Supply Chain</option>
+            <option>Real Estate</option>
+            <option>Marketing & Advertising</option>
+            <option>Manufacturing</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <!-- Role -->
+        <div class="field">
+          <label for="role">Your Role</label>
+          <input id="role" name="role" type="text" placeholder="Head of Operations" />
+        </div>
+
+        <!-- Team Size -->
+        <div class="field full">
+          <label for="team_size">Team Size</label>
+          <select id="team_size" name="team_size">
+            <option value="">Prefer not to say</option>
+            <option>1–10</option>
+            <option>10–25</option>
+            <option>25–50</option>
+            <option>50–200</option>
+            <option>200–1000</option>
+            <option>1000+</option>
+          </select>
+        </div>
+
+        <!-- Pain points -->
+        <div class="field full">
+          <label for="pain_points">Biggest Pain Points</label>
+          <textarea id="pain_points" name="pain_points"
+            placeholder="e.g. Manual lead follow-up is slow, onboarding takes too long, no visibility into pipeline health…"></textarea>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Pipeline status (hidden until submit) -->
+        <div class="pipeline" id="pipeline">
+          <div class="step" id="s1">
+            <div class="step-icon waiting" id="s1i">1</div>
+            <span class="step-label muted" id="s1l">Capturing &amp; validating lead data</span>
+          </div>
+          <div class="step" id="s2">
+            <div class="step-icon waiting" id="s2i">2</div>
+            <span class="step-label muted" id="s2l">Enriching company profile with AI</span>
+          </div>
+          <div class="step" id="s3">
+            <div class="step-icon waiting" id="s3i">3</div>
+            <span class="step-label muted" id="s3l">Generating personalised PDF report</span>
+          </div>
+          <div class="step" id="s4">
+            <div class="step-icon waiting" id="s4i">4</div>
+            <span class="step-label muted" id="s4l">Sending report to your inbox</span>
+          </div>
+          <div class="step" id="s5">
+            <div class="step-icon waiting" id="s5i">5</div>
+            <span class="step-label muted" id="s5l">Logging &amp; archiving</span>
+          </div>
+        </div>
+
+        <!-- Status Banner -->
+        <div class="status-banner" id="statusBanner">
+          <span class="status-icon" id="statusIcon"></span>
+          <span id="statusMsg"></span>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="submitBtn">
+          <span id="btnLabel">Generate My Free Report</span>
+          <span id="btnSpinner" style="display:none" class="spinner"></span>
+        </button>
+
+      </div>
+    </form>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how">
+    <h3>How It Works</h3>
+    <div class="steps-row">
+      <div class="how-step">
+        <div class="num">01</div>
+        <p><strong>You submit</strong> your company details via this form.</p>
+      </div>
+      <div class="how-step">
+        <div class="num">02</div>
+        <p><strong>We research</strong> your business using AI and public sources.</p>
+      </div>
+      <div class="how-step">
+        <div class="num">03</div>
+        <p><strong>A PDF report</strong> lands in your inbox — personalised and professional.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:8000/api";
+
+    // Pipeline step helpers
+    const steps = [
+      { id: "s1", label: "Lead captured & validated" },
+      { id: "s2", label: "Company profile enriched" },
+      { id: "s3", label: "PDF report generated" },
+      { id: "s4", label: "Report delivered to inbox" },
+      { id: "s5", label: "Lead logged & archived" },
+    ];
+
+    function setStep(idx, state) {
+      // state: 'active' | 'done' | 'waiting'
+      const step = steps[idx];
+      const icon = document.getElementById(step.id + "i");
+      const lbl  = document.getElementById(step.id + "l");
+      icon.className = `step-icon ${state}`;
+      icon.textContent = state === "done" ? "✓" : String(idx + 1);
+      lbl.className  = `step-label${state === "waiting" ? " muted" : ""}`;
+      lbl.textContent = state === "done" ? step.label + " ✓" : step.label;
+    }
+
+    function resetPipeline() {
+      steps.forEach((_, i) => setStep(i, "waiting"));
+    }
+
+    async function animatePipeline() {
+      // Simulate real pipeline progress while waiting for response
+      const delays = [300, 1800, 4000, 7000, 9500];
+      for (let i = 0; i < steps.length; i++) {
+        await new Promise(r => setTimeout(r, i === 0 ? delays[0] : delays[i] - delays[i-1]));
+        setStep(i, "active");
+      }
+    }
+
+    function showBanner(type, msg) {
+      const el   = document.getElementById("statusBanner");
+      const icon = document.getElementById("statusIcon");
+      const text = document.getElementById("statusMsg");
+      el.className  = `status-banner show ${type}`;
+      icon.textContent = type === "success" ? "✅" : "❌";
+      text.innerHTML = msg;
+    }
+
+    function setBtn(loading) {
+      document.getElementById("submitBtn").disabled = loading;
+      document.getElementById("btnLabel").textContent  = loading ? "Processing…" : "Generate My Free Report";
+      document.getElementById("btnSpinner").style.display = loading ? "inline-block" : "none";
+    }
+
+    document.getElementById("leadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const form = e.target;
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      // Clear previous state
+      document.getElementById("statusBanner").className = "status-banner";
+      resetPipeline();
+
+      setBtn(true);
+      document.getElementById("pipeline").classList.add("show");
+
+      // Kick off animation (doesn't wait for API)
+      const animPromise = animatePipeline();
+
+      try {
+        const resp = await fetch(`${API_BASE}/leads/submit/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        const result = await resp.json();
+
+        // Mark all steps done on success
+        if (result.success) {
+          steps.forEach((_, i) => setStep(i, "done"));
+          showBanner("success",
+            `<strong>Report on its way!</strong> We've sent a personalised audit report for 
+            <strong>${data.company}</strong> to <strong>${data.email}</strong>. Check your inbox!`
+          );
+          form.reset();
+        } else {
+          const errMsg = result.errors
+            ? Object.values(result.errors).flat().join(", ")
+            : (result.error || "Something went wrong. Please try again.");
+          showBanner("error", `<strong>Error:</strong> ${errMsg}`);
+        }
+      } catch (err) {
+        showBanner("error",
+          `<strong>Could not reach the server.</strong> Make sure the Django backend is running on 
+          <code>http://localhost:8000</code> and try again.`
+        );
+      } finally {
+        setBtn(false);
+      }
+    });
+  </script>
+</body>
+</html>
